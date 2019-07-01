@@ -1,0 +1,25 @@
+---
+# tasks file for chrony timesync ntp
+
+- block:
+    - name: ensure chrony is installed
+      apt:
+        name: chrony
+        install_recommends: no
+        state: latest
+        update_cache: yes
+
+    - name: ensure chrony configuration is copied
+      template:
+        src: chrony.conf.j2
+        dest: "{{ chrony_conf_file }}"
+      notify: restart chrony
+
+    - name: ensure chrony is running after reboot
+      service:
+        name: "{{ chrony_service_name }}"
+        state: started
+        enabled: yes
+  become: yes
+  tags:
+    - chrony
